@@ -16,7 +16,7 @@ namespace XsdValidate
         private void btnValidate_Click(object sender, EventArgs e)
         {
 
-            edLog.Clear();               // стираем старый лог
+            edLog.Clear();
 
             var xsdText = edXsd.Text?.Trim();
             var xmlText = edData.Text?.Trim();
@@ -35,7 +35,6 @@ namespace XsdValidate
                     DtdProcessing = DtdProcessing.Prohibit
                 };
 
-                // считываем схему
                 using (var xsdReader = XmlReader.Create(new StringReader(xsdText)))
                 {
                     settings.Schemas.Add(null, xsdReader);
@@ -43,7 +42,6 @@ namespace XsdValidate
 
                 settings.ValidationEventHandler += ValidationHandler;
 
-                // валидируем XML на лету при чтении
                 using (var xmlReader = XmlReader.Create(new StringReader(xmlText), settings))
                 {
                     while (xmlReader.Read()) { /* просто прогоняем поток */ }
@@ -71,14 +69,5 @@ namespace XsdValidate
             edLog.AppendText($"❌ {e.Severity}: {e.Message}\r\n");
         }
 
-        private void SchemaValidationHandler(object sender, ValidationEventArgs e)
-        {
-            edLog.AppendText(e.Message);
-        }
-
-        private void DocumentValidationHandler(object sender, ValidationEventArgs e)
-        {
-            edLog.AppendText(e.Message);
-        }
     }
 }
