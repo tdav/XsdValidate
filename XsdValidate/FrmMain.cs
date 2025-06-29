@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 using System.Xml;
@@ -29,11 +30,18 @@ namespace XsdValidate
 
             try
             {
+                 
                 var settings = new XmlReaderSettings
                 {
-                    ValidationType = ValidationType.Schema,
-                    DtdProcessing = DtdProcessing.Prohibit
+                    ValidationType = ValidationType.Schema, 
+
                 };
+
+                settings.ValidationFlags |= XmlSchemaValidationFlags.ReportValidationWarnings
+                                        | XmlSchemaValidationFlags.ProcessInlineSchema
+                                        | XmlSchemaValidationFlags.ProcessSchemaLocation
+                                        | XmlSchemaValidationFlags.ProcessIdentityConstraints
+                                        | XmlSchemaValidationFlags.AllowXmlAttributes;
 
                 using (var xsdReader = XmlReader.Create(new StringReader(xsdText)))
                 {
@@ -69,5 +77,21 @@ namespace XsdValidate
             edLog.AppendText($"❌ {e.Severity}: {e.Message}\r\n");
         }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            richTextBox1.Text= "";
+
+
+            var extractor = new XsdRequiredExtractor();
+            extractor.Extract(edXsd.Text, null, textBox1.Text);
+
+            richTextBox1.AppendText("Обязательные элементы:\n");
+            foreach (var el in extractor.RequiredElements)
+                richTextBox1.AppendText("🧵 - " + el+ "\n");
+
+            richTextBox1.AppendText("Обязательные атрибуты:");
+            foreach (var at in extractor.RequiredAttributes)
+                richTextBox1.AppendText("👑 - " + at + "\n");
+        }
     }
 }
